@@ -3,6 +3,10 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <alloca.h>
+#if defined(_MSC_VER)
+#include <malloc.h>
+#endif
+
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
