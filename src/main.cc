@@ -1,3 +1,8 @@
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
+
 #include <cmath>
 #include <node.h>
 #include <node_buffer.h>
@@ -38,12 +43,15 @@ blobdata uint64be_to_blob(uint64_t num) {
 
 
 static bool fillExtra(cryptonote::block& block1, const cryptonote::block& block2) {
+    // (src/cryptonote_core/cryptonote_basic)
     cryptonote::tx_extra_merge_mining_tag mm_tag;
     mm_tag.depth = 0;
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!cryptonote::get_block_header_hash(block2, mm_tag.merkle_root))
         return false;
 
     block1.miner_tx.extra.clear();
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!cryptonote::append_mm_tag_to_extra(block1.miner_tx.extra, mm_tag))
         return false;
 
@@ -58,10 +66,13 @@ static bool mergeBlocks(const cryptonote::block& block1, cryptonote::block& bloc
     block2.parent_block.nonce = block1.nonce;
     block2.parent_block.miner_tx = block1.miner_tx;
     block2.parent_block.number_of_transactions = block1.tx_hashes.size() + 1;
+    // (src/crypto/tree-hash)
     block2.parent_block.miner_tx_branch.resize(crypto::tree_depth(block1.tx_hashes.size() + 1));
     std::vector<crypto::hash> transactionHashes;
+    // (src/cryptonote_core/cryptonote_format_utils)
     transactionHashes.push_back(cryptonote::get_transaction_hash(block1.miner_tx));
     std::copy(block1.tx_hashes.begin(), block1.tx_hashes.end(), std::back_inserter(transactionHashes));
+    // (src/crypto/tree-hash)
     tree_branch(transactionHashes.data(), transactionHashes.size(), block2.parent_block.miner_tx_branch.data());
     block2.parent_block.blockchain_branch = branch2;
     return true;
@@ -93,11 +104,12 @@ NAN_METHOD(convert_blob) {
     blobdata output = "";
 
     //convert
-    block b = AUTO_VAL_INIT(b);
+    block b = block();
     if (!parse_and_validate_block_from_blob(input, b))
         return THROW_ERROR_EXCEPTION("Failed to parse block");
 
     if (b.major_version < BLOCK_MAJOR_VERSION_2) {
+        // (src/cryptonote_core/cryptonote_format_utils)
         if (!get_block_hashing_blob(b, output))
             return THROW_ERROR_EXCEPTION("Failed to create mining block");
     } else {
@@ -105,6 +117,7 @@ NAN_METHOD(convert_blob) {
         if (!construct_parent_block(b, parent_block))
             return THROW_ERROR_EXCEPTION("Failed to construct parent block");
 
+        // (src/cryptonote_core/cryptonote_format_utils)
         if (!get_block_hashing_blob(parent_block, output))
             return THROW_ERROR_EXCEPTION("Failed to create mining block");
     }
@@ -127,11 +140,12 @@ NAN_METHOD(get_block_id) {
     blobdata input = std::string(Buffer::Data(target), Buffer::Length(target));
     blobdata output = "";
 
-    block b = AUTO_VAL_INIT(b);
+    block b = block();
     if (!parse_and_validate_block_from_blob(input, b))
         return THROW_ERROR_EXCEPTION("Failed to parse block");
 
     crypto::hash block_id;
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!get_block_hash(b, block_id))
         return THROW_ERROR_EXCEPTION("Failed to calculate hash for block");
 
@@ -159,7 +173,8 @@ NAN_METHOD(construct_block_blob) {
     blobdata block_template_blob = std::string(Buffer::Data(block_template_buf), Buffer::Length(block_template_buf));
     blobdata output = "";
 
-    block b = AUTO_VAL_INIT(b);
+    block b = block();
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!parse_and_validate_block_from_blob(block_template_blob, b))
         return THROW_ERROR_EXCEPTION("Failed to parse block");
 
@@ -192,6 +207,7 @@ NAN_METHOD(construct_block_blob) {
         return THROW_ERROR_EXCEPTION("Failed to postprocess mining block");
     }
 
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!block_to_blob(b, output))
         return THROW_ERROR_EXCEPTION("Failed to convert block to blob");
 
@@ -213,10 +229,12 @@ NAN_METHOD(convert_blob_bb) {
     blobdata output = "";
 
     //convert
-    bb_block b = AUTO_VAL_INIT(b);
+    bb_block b = bb_block();
+    // (src/cryptonote_core/cryptonote_format_utils)
     if (!parse_and_validate_block_from_blob(input, b)) {
         return THROW_ERROR_EXCEPTION("Failed to parse block");
     }
+    // (src/cryptonote_core/cryptonote_format_utils)
     output = get_block_hashing_blob(b);
 
     v8::Local<v8::Value> returnValue = Nan::CopyBuffer((char*)output.data(), output.size()).ToLocalChecked();
@@ -237,15 +255,18 @@ NAN_METHOD(address_decode) {
 
     blobdata data;
     uint64_t prefix;
+    // (src/common/base58)
     if (!tools::base58::decode_addr(input, prefix, data)) {
         info.GetReturnValue().Set(Nan::Undefined());
     }
 
     account_public_address adr;
+    // (src/serialization/binary_utils)
     if (!::serialization::parse_binary(data, adr)) {
         info.GetReturnValue().Set(Nan::Undefined());
     }
 
+    // (src/crypto/crypto)
     if (!crypto::check_key(adr.m_spend_public_key) || !crypto::check_key(adr.m_view_public_key)) {
         info.GetReturnValue().Set(Nan::Undefined());
     }

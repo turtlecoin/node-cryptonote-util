@@ -7,6 +7,10 @@
         "name": "LucasJones",
         "email": "lucasjonesdev@hotmail.co.uk"
     },
+    "contributors": [
+        "Brandon Lehmann <brandonlehmann@gmail.com>"
+    ],
+    "license": "GPL-3.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/turtlecoin/node-cryptonote-util.git"

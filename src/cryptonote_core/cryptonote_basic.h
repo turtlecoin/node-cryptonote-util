@@ -1,30 +1,27 @@
-// Copyright (c) 2012-2013 The Cryptonote developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+//
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
-#include <boost/variant.hpp>
-#include <boost/functional/hash/hash.hpp>
+#include <mapbox/variant.hpp>
 #include <iostream>
 #include <vector>
-#include <cstring>  // memcmp
+#include <cstring>
 #include <sstream>
+
 #include "serialization/serialization.h"
 #include "serialization/variant.h"
 #include "serialization/vector.h"
 #include "serialization/binary_archive.h"
-#include "serialization/json_archive.h"
-#include "serialization/debug_archive.h"
 #include "serialization/crypto.h"
-#include "serialization/keyvalue_serialization.h" // eepe named serialization
-#include "string_tools.h"
 #include "cryptonote_config.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
-#include "misc_language.h"
 #include "tx_extra.h"
 
+using namespace mapbox;
 
 namespace cryptonote
 {
@@ -36,11 +33,9 @@ namespace cryptonote
   bool get_transaction_hash(const transaction& t, crypto::hash& res);
   bool get_mm_tag_from_extra(const std::vector<uint8_t>& tx, tx_extra_merge_mining_tag& mm_tag);
 
-  const static crypto::hash null_hash = AUTO_VAL_INIT(null_hash);
-  const static crypto::public_key null_pkey = AUTO_VAL_INIT(null_pkey);
+  const static crypto::hash null_hash = crypto::hash();
 
   typedef std::vector<crypto::signature> ring_signature;
-
 
   /* outputs */
 
@@ -130,11 +125,9 @@ namespace cryptonote
     END_SERIALIZE()
   };
 
-
-  typedef boost::variant<txin_gen, txin_to_script, txin_to_scripthash, txin_to_key> txin_v;
-
-  typedef boost::variant<txout_to_script, txout_to_scripthash, txout_to_key> txout_target_v;
-  typedef boost::variant<txout_to_script, txout_to_scripthash, bb_txout_to_key> bb_txout_target_v;
+  typedef util::variant<txin_gen, txin_to_script, txin_to_scripthash, txin_to_key> txin_v;
+  typedef util::variant<txout_to_script, txout_to_scripthash, txout_to_key> txout_target_v;
+  typedef util::variant<txout_to_script, txout_to_scripthash, bb_txout_to_key> bb_txout_target_v;
 
   //typedef std::pair<uint64_t, txout> out_t;
   struct tx_out
@@ -349,12 +342,6 @@ namespace cryptonote
     return boost::apply_visitor(txin_signature_size_visitor(), tx_in);
   }
 
-
-
-  /************************************************************************/
-  /*                                                                      */
-  /************************************************************************/
-
   const uint8_t CURRENT_BYTECOIN_BLOCK_MAJOR_VERSION = 1;
 
   struct bytecoin_block
@@ -495,7 +482,6 @@ namespace cryptonote
     return serializable_bytecoin_block(block_ref.parent_block, block_ref.timestamp, hashing_serialization, header_only);
   }
 
-
   struct bb_block_header
   {
     uint8_t major_version;
@@ -540,11 +526,6 @@ namespace cryptonote
       FIELD(m_spend_public_key)
       FIELD(m_view_public_key)
     END_SERIALIZE()
-
-    BEGIN_KV_SERIALIZE_MAP()
-      KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_spend_public_key)
-      KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_view_public_key)
-    END_KV_SERIALIZE_MAP()
   };
 
   struct keypair
@@ -577,25 +558,3 @@ VARIANT_TAG(binary_archive, cryptonote::txout_to_key, 0x2);
 VARIANT_TAG(binary_archive, cryptonote::bb_txout_to_key, 0x2);
 VARIANT_TAG(binary_archive, cryptonote::transaction, 0xcc);
 VARIANT_TAG(binary_archive, cryptonote::block, 0xbb);
-
-VARIANT_TAG(json_archive, cryptonote::txin_gen, "gen");
-VARIANT_TAG(json_archive, cryptonote::txin_to_script, "script");
-VARIANT_TAG(json_archive, cryptonote::txin_to_scripthash, "scripthash");
-VARIANT_TAG(json_archive, cryptonote::txin_to_key, "key");
-VARIANT_TAG(json_archive, cryptonote::txout_to_script, "script");
-VARIANT_TAG(json_archive, cryptonote::txout_to_scripthash, "scripthash");
-VARIANT_TAG(json_archive, cryptonote::txout_to_key, "key");
-VARIANT_TAG(json_archive, cryptonote::bb_txout_to_key, "key");
-VARIANT_TAG(json_archive, cryptonote::transaction, "tx");
-VARIANT_TAG(json_archive, cryptonote::block, "block");
-
-VARIANT_TAG(debug_archive, cryptonote::txin_gen, "gen");
-VARIANT_TAG(debug_archive, cryptonote::txin_to_script, "script");
-VARIANT_TAG(debug_archive, cryptonote::txin_to_scripthash, "scripthash");
-VARIANT_TAG(debug_archive, cryptonote::txin_to_key, "key");
-VARIANT_TAG(debug_archive, cryptonote::txout_to_script, "script");
-VARIANT_TAG(debug_archive, cryptonote::txout_to_scripthash, "scripthash");
-VARIANT_TAG(debug_archive, cryptonote::txout_to_key, "key");
-VARIANT_TAG(debug_archive, cryptonote::bb_txout_to_key, "key");
-VARIANT_TAG(debug_archive, cryptonote::transaction, "tx");
-VARIANT_TAG(debug_archive, cryptonote::block, "block");

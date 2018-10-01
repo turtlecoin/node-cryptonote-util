@@ -1,10 +1,8 @@
-// Copyright (c) 2012-2013 The Cryptonote developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
-/* binary_archive.h
- *
- * Portable (low-endian) binary archive */
 #pragma once
 
 #include <cassert>
@@ -17,8 +15,6 @@
 
 PUSH_WARNINGS
 DISABLE_VS_WARNINGS(4244)
-
-//TODO: fix size_t warning in x32 platform
 
 template <class Stream, bool IsSaving>
 struct binary_archive_base

@@ -1,19 +1,21 @@
-// Copyright (c) 2012-2013 The Cryptonote developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
+#include <mapbox/variant.hpp>
 
 #define TX_EXTRA_PADDING_MAX_COUNT          255
 #define TX_EXTRA_NONCE_MAX_COUNT            255
-
 #define TX_EXTRA_TAG_PADDING                0x00
 #define TX_EXTRA_TAG_PUBKEY                 0x01
 #define TX_EXTRA_NONCE                      0x02
 #define TX_EXTRA_MERGE_MINING_TAG           0x03
-
 #define TX_EXTRA_NONCE_PAYMENT_ID           0x00
+
+using namespace mapbox;
 
 namespace cryptonote
 {
@@ -135,7 +137,7 @@ namespace cryptonote
   //   varint tag;
   //   varint size;
   //   varint data[];
-  typedef boost::variant<tx_extra_padding, tx_extra_pub_key, tx_extra_nonce, tx_extra_merge_mining_tag> tx_extra_field;
+  typedef util::variant<tx_extra_padding, tx_extra_pub_key, tx_extra_nonce, tx_extra_merge_mining_tag> tx_extra_field;
 }
 
 VARIANT_TAG(binary_archive, cryptonote::tx_extra_padding, TX_EXTRA_TAG_PADDING);
