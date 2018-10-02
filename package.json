@@ -1,5 +1,5 @@
 {
-    "name": "cryptonote-util",
+    "name": "turtlecoin-cryptonote-util",
     "version": "0.0.5",
     "main": "cryptonote",
     "gypfile": true,
