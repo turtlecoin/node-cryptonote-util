@@ -1,4 +1,8 @@
+#if !defined(_WIN32)
 #include <cmath>
+#endif
+
+#include <chrono>
 #include <node.h>
 #include <node_buffer.h>
 #include <v8.h>
