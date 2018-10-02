@@ -51,7 +51,7 @@ namespace misc_utils
         inline uint64_t get_tick_count()
         {
 #if defined(_MSC_VER)
-                return ::GetTickCount64();
+                return ::GetTickCount();
 #elif defined(__MACH__)
                 clock_serv_t cclock;
                 mach_timespec_t mts;

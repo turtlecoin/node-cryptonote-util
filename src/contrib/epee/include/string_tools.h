@@ -29,6 +29,10 @@
 #ifndef _STRING_TOOLS_H_
 #define _STRING_TOOLS_H_
 
+#if defined(_WIN32)
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+
 //#include <objbase.h>
 #include <locale>
 #include <cstdlib>
