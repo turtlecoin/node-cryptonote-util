@@ -7,6 +7,7 @@
 #### Development Build Status
 [![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=development)](https://travis-ci.org/node-cryptonote-util/turtlecoin) [![Build status](https://ci.appveyor.com/api/projects/status/6ud0prgv77ogthu4/branch/development?svg=true)](https://ci.appveyor.com/project/brandonlehmann/node-cryptonote-util/branch/development)
 
+[![NPM](https://nodei.co/npm/turtlecoin-cryptonote-util.png?downloads=true&stars=true)](https://nodei.co/npm/turtlecoin-cryptonote-util/)
 
 # Node-Cryptonote-Util
 
