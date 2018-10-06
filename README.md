@@ -1,10 +1,11 @@
 ![image](https://user-images.githubusercontent.com/34389545/35821974-62e0e25c-0a70-11e8-87dd-2cfffeb6ed47.png)
 
 #### Master Build Status
-[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=master)](https://travis-ci.org/node-cryptonote-util/turtlecoin)
+[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=master)](https://travis-ci.org/node-cryptonote-util/turtlecoin) [![Build status](https://ci.appveyor.com/api/projects/status/6ud0prgv77ogthu4/branch/master?svg=true)](https://ci.appveyor.com/project/brandonlehmann/node-cryptonote-util/branch/master)
+
 
 #### Development Build Status
-[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=development)](https://travis-ci.org/node-cryptonote-util/turtlecoin)
+[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=development)](https://travis-ci.org/node-cryptonote-util/turtlecoin) [![Build status](https://ci.appveyor.com/api/projects/status/6ud0prgv77ogthu4/branch/development?svg=true)](https://ci.appveyor.com/project/brandonlehmann/node-cryptonote-util/branch/development)
 
 
 # Node-Cryptonote-Util
