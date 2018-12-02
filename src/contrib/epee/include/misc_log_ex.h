@@ -451,242 +451,6 @@ namespace log_space
     return true;
   }
 
-
-
-
-  //--------------------------------------------------------------------------//
-  class file_output_stream : public ibase_log_stream
-  {
-  public:
-    typedef std::map<std::string, std::ofstream*> named_log_streams;
-
-    file_output_stream( std::string default_log_file_name, std::string log_path )
-    {
-      m_default_log_filename = default_log_file_name;
-      m_max_logfile_size = 0;
-      m_default_log_path = log_path;
-      m_pdefault_file_stream = add_new_stream_and_open(default_log_file_name.c_str());
-    }
-
-    ~file_output_stream()
-    {
-      for(named_log_streams::iterator it = m_log_file_names.begin(); it!=m_log_file_names.end(); it++)
-      {
-        if ( it->second->is_open() )
-        {
-          it->second->flush();
-          it->second->close();
-        }
-        delete it->second;
-      }
-    }
-  private:
-    named_log_streams m_log_file_names;
-    std::string       m_default_log_path;
-    std::ofstream*    m_pdefault_file_stream;
-    std::string     m_log_rotate_cmd;
-    std::string     m_default_log_filename;
-    uint64_t   m_max_logfile_size;
-
-
-    std::ofstream*    add_new_stream_and_open(const char* pstream_name)
-    {
-      //log_space::rotate_log_file((m_default_log_path + "\\" + pstream_name).c_str());
-
-      std::ofstream* pstream = (m_log_file_names[pstream_name] = new std::ofstream);
-      std::string target_path = m_default_log_path + "/" + pstream_name;
-      pstream->open( target_path.c_str(), std::ios_base::out | std::ios::app /*ios_base::trunc */);
-      if(pstream->fail())
-        return NULL;
-      return pstream;
-    }
-
-    bool set_max_logfile_size(uint64_t max_size)
-    {
-      m_max_logfile_size = max_size;
-      return true;
-    }
-
-    bool set_log_rotate_cmd(const std::string& cmd)
-    {
-      m_log_rotate_cmd = cmd;
-      return true;
-    }
-
-
-
-    virtual bool out_buffer( const char* buffer, int buffer_len, int log_level, int color, const char* plog_name = NULL )
-    {
-      std::ofstream*    m_target_file_stream = m_pdefault_file_stream;
-      if(plog_name)
-      { //find named stream
-        named_log_streams::iterator it = m_log_file_names.find(plog_name);
-        if(it == m_log_file_names.end())
-          m_target_file_stream = add_new_stream_and_open(plog_name);
-        else
-          m_target_file_stream = it->second;
-      }
-      if(!m_target_file_stream || !m_target_file_stream->is_open())
-        return false;//TODO: add assert here
-
-      m_target_file_stream->write(buffer, buffer_len );
-      m_target_file_stream->flush();
-
-      if(m_max_logfile_size)
-      {
-        std::ofstream::pos_type pt =  m_target_file_stream->tellp();
-        uint64_t current_sz = pt;
-        if(current_sz > m_max_logfile_size)
-        {
-          std::cout << "current_sz= " << current_sz << " m_max_logfile_size= " << m_max_logfile_size << std::endl;
-          std::string log_file_name;
-          if(!plog_name)
-            log_file_name = m_default_log_filename;
-          else
-            log_file_name = plog_name;
-
-          m_target_file_stream->close();
-          std::string new_log_file_name = log_file_name;
-
-          time_t tm = 0;
-          time(&tm);
-
-          int err_count = 0;
-          boost::system::error_code ec;
-          do
-          {
-            new_log_file_name = string_tools::cut_off_extension(log_file_name);
-            if(err_count)
-              new_log_file_name += misc_utils::get_time_str_v2(tm) + "(" + boost::lexical_cast<std::string>(err_count) + ")" + ".log";
-            else
-              new_log_file_name += misc_utils::get_time_str_v2(tm) + ".log";
-
-            err_count++;
-          }while(boost::filesystem::exists(m_default_log_path + "/" + new_log_file_name, ec));
-
-          std::string new_log_file_path = m_default_log_path + "/" + new_log_file_name;
-          boost::filesystem::rename(m_default_log_path + "/" + log_file_name, new_log_file_path, ec);
-          if(ec)
-          {
-            std::cout << "Filed to rename, ec = " << ec.message() << std::endl;
-          }
-
-          if(m_log_rotate_cmd.size())
-          {
-
-            std::string m_log_rotate_cmd_local_copy = m_log_rotate_cmd;
-            //boost::replace_all(m_log_rotate_cmd, "[*SOURCE*]", new_log_file_path);
-            boost::replace_all(m_log_rotate_cmd_local_copy, "[*TARGET*]", new_log_file_path);
-
-            misc_utils::call_sys_cmd(m_log_rotate_cmd_local_copy);
-          }
-
-          m_target_file_stream->open( (m_default_log_path + "/" + log_file_name).c_str(), std::ios_base::out | std::ios::app /*ios_base::trunc */);
-          if(m_target_file_stream->fail())
-            return false;
-        }
-      }
-
-      return  true;
-    }
-    int get_type(){return LOGGER_FILE;}
-  };
-  /************************************************************************/
-  /*                                                                      */
-  /************************************************************************/
-  class log_stream_splitter
-  {
-  public:
-    typedef std::list<std::pair<ibase_log_stream*, int> > streams_container;
-
-    log_stream_splitter(){}
-    ~log_stream_splitter()
-    {
-      //free pointers
-      std::for_each(m_log_streams.begin(), m_log_streams.end(), delete_ptr());
-    }
-
-    bool set_max_logfile_size(uint64_t max_size)
-    {
-      for(streams_container::iterator it = m_log_streams.begin(); it!=m_log_streams.end();it++)
-        it->first->set_max_logfile_size(max_size);
-      return true;
-    }
-
-    bool set_log_rotate_cmd(const std::string& cmd)
-    {
-      for(streams_container::iterator it = m_log_streams.begin(); it!=m_log_streams.end();it++)
-        it->first->set_log_rotate_cmd(cmd);
-      return true;
-    }
-
-    bool do_log_message(const std::string& rlog_mes, int log_level, int color, const char* plog_name = NULL)
-    {
-      std::string str_mess = rlog_mes;
-      size_t str_len = str_mess.size();
-      const char* pstr = str_mess.c_str();
-      for(streams_container::iterator it = m_log_streams.begin(); it!=m_log_streams.end();it++)
-        if(it->second >= log_level)
-          it->first->out_buffer(pstr, (int)str_len, log_level, color, plog_name);
-      return true;
-    }
-
-    bool add_logger( int type, const char* pdefault_file_name, const char* pdefault_log_folder, int log_level_limit = LOG_LEVEL_4 )
-    {
-      ibase_log_stream* ls = NULL;
-
-      switch( type )
-      {
-      case LOGGER_FILE:
-        ls = new file_output_stream( pdefault_file_name, pdefault_log_folder );
-        break;
-
-      case LOGGER_DEBUGGER:
-#ifdef _MSC_VER
-        ls = new debug_output_stream( );
-#else
-        return false;//not implemented yet
-#endif
-        break;
-      case LOGGER_CONSOLE:
-        ls = new console_output_stream( );
-        break;
-      }
-
-      if ( ls ) {
-        m_log_streams.push_back(streams_container::value_type(ls, log_level_limit));
-        return true;
-      }
-      return ls ? true:false;
-    }
-    bool add_logger( ibase_log_stream* pstream, int log_level_limit = LOG_LEVEL_4 )
-    {
-      m_log_streams.push_back(streams_container::value_type(pstream, log_level_limit) );
-      return true;
-    }
-
-    bool remove_logger(int type)
-    {
-      streams_container::iterator it = m_log_streams.begin();
-      for(;it!=m_log_streams.end(); it++)
-      {
-        if(it->first->get_type() == type)
-        {
-          delete it->first;
-          m_log_streams.erase(it);
-          return true;
-        }
-      }
-      return false;
-
-    }
-
-  protected:
-  private:
-
-        streams_container m_log_streams;
-  };
-
   /************************************************************************/
   /*                                                                      */
   /************************************************************************/
@@ -755,7 +519,6 @@ namespace log_space
     bool set_max_logfile_size(uint64_t max_size)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      m_log_target.set_max_logfile_size(max_size);
       CRITICAL_REGION_END();
       return true;
     }
@@ -763,7 +526,6 @@ namespace log_space
     bool set_log_rotate_cmd(const std::string& cmd)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      m_log_target.set_log_rotate_cmd(cmd);
       CRITICAL_REGION_END();
       return true;
     }
@@ -779,7 +541,6 @@ namespace log_space
     bool do_log_message(const std::string& rlog_mes, int log_level, int color, bool add_to_journal = false, const char* plog_name = NULL)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      m_log_target.do_log_message(rlog_mes, log_level, color, plog_name);
       if(add_to_journal)
         m_journal.push_back(rlog_mes);
 
@@ -790,20 +551,20 @@ namespace log_space
     bool add_logger( int type, const char* pdefault_file_name, const char* pdefault_log_folder , int log_level_limit = LOG_LEVEL_4)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      return m_log_target.add_logger( type, pdefault_file_name, pdefault_log_folder, log_level_limit);
+      return true;
       CRITICAL_REGION_END();
     }
     bool add_logger( ibase_log_stream* pstream, int log_level_limit = LOG_LEVEL_4)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      return m_log_target.add_logger(pstream, log_level_limit);
+      return true;
       CRITICAL_REGION_END();
     }
 
     bool remove_logger(int type)
     {
       CRITICAL_REGION_BEGIN(m_critical_sec);
-      return m_log_target.remove_logger(type);
+      return true;
       CRITICAL_REGION_END();
     }
 
@@ -866,7 +627,7 @@ namespace log_space
       return true;
     }
 
-    log_stream_splitter m_log_target;
+    
 
     std::string m_default_log_folder;
     std::string m_default_log_file;
