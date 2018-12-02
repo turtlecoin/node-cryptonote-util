@@ -195,6 +195,15 @@ NAN_METHOD(construct_block_blob) {
       if (!mergeBlocks(parent_block, b, std::vector<crypto::hash>()))
         return THROW_ERROR_EXCEPTION("Failed to postprocess mining block");
     }
+    if (b.major_version == BLOCK_MAJOR_VERSION_5) {
+      block parent_block;
+      b.parent_block.nonce = nonce;
+      if (!construct_parent_block(b, parent_block))
+        return THROW_ERROR_EXCEPTION("Failed to construct parent block");
+
+      if (!mergeBlocks(parent_block, b, std::vector<crypto::hash>()))
+        return THROW_ERROR_EXCEPTION("Failed to postprocess mining block");
+    }
 
     if (!block_to_blob(b, output))
         return THROW_ERROR_EXCEPTION("Failed to convert block to blob");
