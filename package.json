@@ -1,6 +1,6 @@
 {
     "name": "turtlecoin-cryptonote-util",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "main": "cryptonote",
     "gypfile": true,
     "author": {
@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "bindings": "*",
-        "nan": "^2.11.1",
+        "nan": "^2.14.0",
         "safe-buffer": "^5.1.2"
     },
     "keywords": [
