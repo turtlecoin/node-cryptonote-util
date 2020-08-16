@@ -31,6 +31,22 @@ const block = {
     reservedOffset: 411
 };
 
+const block_template_new = {
+    blocktemplate: '0600b202c10839114a0beff7a198f58c8bb98dcb7bece23fe470f8932a7f408d966b0000ff97e5f9050000000000000' +
+        '0000000000000000000000000000000000000000000000000000000000001000000002303210000000000000000000000000000000' +
+        '0000000000000000000000000000000000001ecb4ab0101ffc4b4ab0106060295cfad0503908a8b7309d7167dcff4867bd31cf02a5' +
+        '888bfb3a3c33fed81991d64029fd4040457feb01a915b1791a0b01e32e26414b105f500660edd9bbf4092c08ae80702101fe42efb6' +
+        '5a694c3508758af2b05184858827f8b3494f2b29eb288d4d7bc19c0b80202d903c42269db0d5c5f961d717bf8f467582cb2ac5c2bb' +
+        '189d57743d97b2e73e0e0dc2a021abb1f568a7aa4f0ba2ed2238c495ebaa0a8012abfd63fcb31836a11dcfd94c580897a02807910d' +
+        '7993d5c21e367f466918da568fb3a8ab96ccaed732000087a2535647f8c0101651ba7aa2bf4fd745ce1ab683c7d6ab5a9db5295112' +
+        '5627d437b3cb91324497f0706000000000000045d0dd5b208bf363b00d9e941197f1bea7df5336ee70a854ffdc42c13caca704505a' +
+        '9f0d9e66a156ead440c72e168b4a4e656e1822593537898b9d6e93a3267583006e31a73a4fc42368ff94bcdd92e02bffd144c934c3' +
+        '48b5d1015b7b1354741fa0100',
+    difficulty: 11396601479,
+    height: 2808388,
+    reservedOffset: 378
+}
+
 const expected_mining_blob = '0100b5f9abe605b4318c1249164393f7b9d691e60aba81ca9bbffb9e0b23e6b01c93d9c621ab800000000' +
     '04b27c162bc89b0bdfa0db8b5c99977943caf754bb6181d8e1bafc6af2ab0b0bb01';
 
@@ -68,34 +84,6 @@ describe('CryptoNote Utilities Tests', async () => {
         assert(prefix === expected_prefix);
     })
 
-    it('To Mining Blob', async () => {
-        const blob = Buffer.from(block.blocktemplate, 'hex');
-
-        const miningBlob = await CryptoNoteUtils.convert_blob(blob);
-
-        assert(miningBlob.toString('hex') === expected_mining_blob);
-    })
-
-    it('Merge Blocks: Nonce Number', async () => {
-        const blob = Buffer.from(block.blocktemplate, 'hex');
-
-        const merged = await CryptoNoteUtils.construct_block_blob(blob, 0x1c64);
-
-        assert(merged.toString('hex') === expected_merged_block);
-    })
-
-    it('Merge Blocks: Nonce Buffer', async () => {
-        const blob = Buffer.from(block.blocktemplate, 'hex');
-
-        const nonce = Buffer.alloc(4);
-
-        nonce.writeUInt32LE(0x1c64, 0);
-
-        const merged = await CryptoNoteUtils.construct_block_blob(blob, nonce);
-
-        assert(merged.toString('hex') === expected_merged_block);
-    })
-
     it('Calculates Block ID', async () => {
         const block = Buffer.from(expected_merged_block, 'hex');
 
@@ -103,4 +91,58 @@ describe('CryptoNote Utilities Tests', async () => {
 
         assert(id.toString('hex') === expected_block_id);
     })
+
+    describe('Pre Prove Coinbase TX Claiming', async () => {
+        it('To Mining Blob', async () => {
+            const blob = Buffer.from(block.blocktemplate, 'hex');
+
+            const miningBlob = await CryptoNoteUtils.convert_blob(blob);
+
+            assert(miningBlob.toString('hex') === expected_mining_blob);
+        })
+
+        it('Merge Blocks: Nonce Number', async () => {
+            const blob = Buffer.from(block.blocktemplate, 'hex');
+
+            const merged = await CryptoNoteUtils.construct_block_blob(blob, 0x1c64);
+
+            assert(merged.toString('hex') === expected_merged_block);
+        })
+
+        it('Merge Blocks: Nonce Buffer', async () => {
+            const blob = Buffer.from(block.blocktemplate, 'hex');
+
+            const nonce = Buffer.alloc(4);
+
+            nonce.writeUInt32LE(0x1c64, 0);
+
+            const merged = await CryptoNoteUtils.construct_block_blob(blob, nonce);
+
+            assert(merged.toString('hex') === expected_merged_block);
+        })
+    });
+
+    describe('Post Prove Coinbase TX Claiming', async () => {
+        it('Block ID', async() => {
+            const blob = Buffer.from(block_template_new.blocktemplate, 'hex');
+
+            const id = await CryptoNoteUtils.get_block_id(blob);
+
+            const expected_id = '12cea80912fa3eb82aebe32d44eb35ea4e5d7e3dbca54b7fc0bd980e86abacfb';
+
+            assert(id.toString('hex') === expected_id);
+        })
+
+        it('To Mining Blob', async () => {
+            const blob = Buffer.from(block_template_new.blocktemplate, 'hex');
+
+            const merged = await CryptoNoteUtils.convert_blob(blob);
+
+            const expected_merged =
+                '0100ff97e5f905b202c10839114a0beff7a198f58c8bb98dcb7bece23fe470f8932a7f408d966b00000000da12ed6f1ded6' +
+                '1ada5c823311905f0e30d4f4884dba13b811e837f5fa55b07af01';
+
+            assert(merged.toString('hex') === expected_merged);
+        })
+    });
 })
