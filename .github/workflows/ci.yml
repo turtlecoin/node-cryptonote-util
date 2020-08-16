@@ -32,7 +32,7 @@ jobs:
     - name: Install Dependencies
       run: npm install
     - name: Generate Prebuilds
-      if: matrix.node == '12' && github.event_name == 'release' && matrix.os != 'windows-latest' && github.repository == 'turtlecoin/turtlecoin-crypto'
+      if: matrix.node == '12' && github.event_name == 'release' && github.repository == 'turtlecoin/turtlecoin-crypto'
       run: |
         npm install -g prebuild
         prebuild --all --strip -u ${{ secrets.GITHUB_TOKEN }}
