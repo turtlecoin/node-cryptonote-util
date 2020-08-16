@@ -20,7 +20,15 @@ export function address_decode (address: Buffer): number {
  * @param block the block template blob
  * @param nonce
  */
-export function construct_block_blob(block: Buffer, nonce: Buffer): Buffer {
+export function construct_block_blob(block: Buffer, nonce: Buffer | number): Buffer {
+    if (!(nonce instanceof Buffer)) {
+        const tmp = Buffer.alloc(4);
+
+        tmp.writeUInt32LE(nonce, 0);
+
+        nonce = tmp;
+    }
+
     return native.construct_block_blob(block, nonce);
 }
 
@@ -75,7 +83,7 @@ export default class CryptoNoteUtils {
      * @param block the block blob
      * @param nonce
      */
-    public static async construct_block_blob(block: Buffer, nonce: Buffer): Promise<Buffer> {
+    public static async construct_block_blob(block: Buffer, nonce: Buffer | number): Promise<Buffer> {
         return construct_block_blob(block, nonce);
     }
 
