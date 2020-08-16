@@ -32,12 +32,12 @@ jobs:
     - name: Install Dependencies
       run: npm install
     - name: Generate Prebuilds
-      if: matrix.node == '12' && github.event_name == 'release' && github.repository == 'turtlecoin/turtlecoin-crypto'
+      if: matrix.node == '12' && github.repository == 'turtlecoin/node-cryptonote-util'
       run: |
         npm install -g prebuild
-        prebuild --all --strip -u ${{ secrets.GITHUB_TOKEN }}
+        prebuild --all
     - name: Publish to NPM
-      if: matrix.node == '12' && matrix.os == 'ubuntu-latest' && github.event_name == 'release' && github.repository == 'turtlecoin/turtlecoin-crypto'
+      if: github.event_name == 'release' && matrix.node == '12' && matrix.os == 'ubuntu-latest' && github.repository == 'turtlecoin/node-cryptonote-util'
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: npm publish
