@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
         node: ['10', '11', '12', '13', '14']
     name: ${{ matrix.os }} - Node ${{ matrix.node }} Test
     steps:
@@ -29,10 +29,6 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libboost-all-dev
-    - name: Fetch OSX Dependencies
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install --force boost
     - name: Install Dependencies
       run: npm install
     - name: Generate Prebuilds
