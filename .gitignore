@@ -133,3 +133,4 @@ typings/
 *.iml
 build
 prebuilds
+dist
