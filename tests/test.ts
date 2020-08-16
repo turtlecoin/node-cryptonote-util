@@ -54,6 +54,8 @@ const expected_merged_block = '0500b4318c1249164393f7b9d691e60aba81ca9bbffb9e0b2
     '801ac665dd0a3b16cc648a651546c7a3633f0a0274bb3815d6bda05e12fb7cbb908ceb582590a84a30ba6043178279343f5107713390b8' +
     'e2ca2a8723ee7e5855c6af674bbd9b5a'
 
+const expected_block_id = '8e466960ef1cfffdcac94f8b0595d9edbcd54559649a1bfc934141f9ab013e9a';
+
 describe('CryptoNote Utilities Tests', async () => {
     it('Address Prefix Decoding', async () => {
         const address = Buffer.from(
@@ -92,5 +94,13 @@ describe('CryptoNote Utilities Tests', async () => {
         const merged = await CryptoNoteUtils.construct_block_blob(blob, nonce);
 
         assert(merged.toString('hex') === expected_merged_block);
+    })
+
+    it('Calculates Block ID', async () => {
+        const block = Buffer.from(expected_merged_block, 'hex');
+
+        const id = await CryptoNoteUtils.get_block_id(block);
+
+        assert(id.toString('hex') === expected_block_id);
     })
 })
