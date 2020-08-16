@@ -88,7 +88,7 @@ NAN_METHOD(convert_blob) {
     if (info.Length() < 1)
         return THROW_ERROR_EXCEPTION("You must provide one argument.");
 
-    Local<Object> target = info[0]->ToObject();
+    Local<Object> target = info[0]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
 
     if (!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
@@ -123,7 +123,7 @@ NAN_METHOD(get_block_id) {
     if (info.Length() < 1)
         return THROW_ERROR_EXCEPTION("You must provide one argument.");
 
-    Local<Object> target = info[0]->ToObject();
+    Local<Object> target = info[0]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
 
     if (!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
@@ -149,8 +149,9 @@ NAN_METHOD(construct_block_blob) {
     if (info.Length() < 2)
         return THROW_ERROR_EXCEPTION("You must provide two arguments.");
 
-    Local<Object> block_template_buf = info[0]->ToObject();
-    Local<Object> nonce_buf = info[1]->ToObject();
+    Local<Object> block_template_buf = info[0]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
+
+    Local<Object> nonce_buf = info[1]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
 
     if (!Buffer::HasInstance(block_template_buf) || !Buffer::HasInstance(nonce_buf))
         return THROW_ERROR_EXCEPTION("Both arguments should be buffer objects.");
@@ -190,7 +191,7 @@ NAN_METHOD(convert_blob_bb) {
     if (info.Length() < 1)
         return THROW_ERROR_EXCEPTION("You must provide one argument.");
 
-    Local<Object> target = info[0]->ToObject();
+    Local<Object> target = info[0]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
 
     if (!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
@@ -214,7 +215,7 @@ NAN_METHOD(address_decode) {
     if (info.Length() < 1)
         return THROW_ERROR_EXCEPTION("You must provide one argument.");
 
-    Local<Object> target = info[0]->ToObject();
+    Local<Object> target = info[0]->ToObject(Nan::GetCurrentContext()).FromMaybe(Local<Object>());
 
     if (!Buffer::HasInstance(target))
         return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
