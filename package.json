@@ -16,11 +16,13 @@
         "url": "https://github.com/turtlecoin/node-cryptonote-util.git"
     },
     "scripts": {
+        "install": "prebuild-install --download --verbose || node-gyp rebuild",
         "test": "node-gyp clean && node-gyp configure && node-gyp build && node test.js"
     },
     "dependencies": {
         "bindings": "^1.5.0",
         "nan": "^2.14.1",
+        "prebuild-install": "^5.3.5",
         "safe-buffer": "^5.2.1"
     },
     "keywords": [
