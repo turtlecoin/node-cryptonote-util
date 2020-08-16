@@ -1,4 +1,8 @@
 {
+  "variables": {
+    "v8_enable_pointer_compression": "false",
+    "v8_enable_31bit_smis_on_64bit_arch": "false"
+  },
   "targets": [
     {
       "target_name": "cryptonote",
