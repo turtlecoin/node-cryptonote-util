@@ -1,15 +1,17 @@
 ![image](https://user-images.githubusercontent.com/34389545/35821974-62e0e25c-0a70-11e8-87dd-2cfffeb6ed47.png)
 
 #### Master Build Status
-[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=master)](https://travis-ci.org/node-cryptonote-util/turtlecoin) [![Build status](https://ci.appveyor.com/api/projects/status/github/turtlecoin/node-cryptonote-util?branch=master&svg=true)](https://ci.appveyor.com/project/RocksteadyTC/node-cryptonote-util/branch/master)
-
+[![Build Status](https://github.com/turtlecoin/node-cryptonote-util/workflows/CI%20Build%20Tests/badge.svg?branch=master)](https://github.com/turtlecoin/node-cryptonote-util/actions)
 
 #### Development Build Status
-[![Build Status](https://travis-ci.org/turtlecoin/node-cryptonote-util.svg?branch=development)](https://travis-ci.org/node-cryptonote-util/turtlecoin) [![Build status](https://ci.appveyor.com/api/projects/status/github/turtlecoin/node-cryptonote-util?branch=development&svg=true)](https://ci.appveyor.com/project/RocksteadyTC/node-cryptonote-util/branch/development)
+[![Build Status](https://github.com/turtlecoin/node-cryptonote-util/workflows/CI%20Build%20Tests/badge.svg?branch=development)](https://github.com/turtlecoin/node-cryptonote-util/actions)
 
 [![NPM](https://nodei.co/npm/turtlecoin-cryptonote-util.png?downloads=true&stars=true)](https://nodei.co/npm/turtlecoin-cryptonote-util/)
 
 # Node-Cryptonote-Util
+
+**Note:** We build prebuilds of the Node.js native addon module binaries that are included for distribution with the NPM
+installed version of this package to speed up your development and use of this package.
 
 Supported on the following platforms:
 
@@ -21,30 +23,49 @@ Supported on the following platforms:
 * Node.js LTS (https://nodejs.org/) 10+
 * Boost (http://www.boost.org/)
 
-## Installation Instructions
+#### Windows (if not using prebuilds)
 
-### *Nix
-
-```bash
-sudo apt-get install libboost-all-dev
-git clone https://github.com/turtlecoin/node-cryptonote-util
-cd node-cryptonote-util
-npm install && npm test
-```
-
-### Windows
-
-#### Prerequisite
-
-Read very carefully if you want this to work right the first time.
+Read very careful if you want this to work right the first time.
 
 1) Open a *Windows Powershell* console as **Administrator**
+
 2) Run the command: `npm install -g windows-build-tools --vs2015`
    ***This will take a while. Sit tight.***
-   
-Once the prerequisites are complete, proceed with the following:
+
+## Installation
 
 ```bash
-cd <your node-cryptonote-util directory>
-npm install && npm test
+npm install turtlecoin-cryptonote-util
 ```
+
+### Intialization
+
+#### TypeScript
+
+##### Importing Individual Synchronous Methods
+
+```javascript
+import { 
+    address_decode, 
+    construct_block_blob, 
+    convert_blob, 
+    convert_blob_bb, 
+    get_block_id 
+} from 'turtlecoin-cryptonote-util';
+```
+
+##### Importing Async Class
+
+```javascript
+import CryptoNoteUtils from 'turtlecoin-cryptonote-util';
+```
+
+#### CommonJS
+
+```javascript
+const cnUtils = require('turtlecoin-cryptonote-util');
+```
+
+### Documentation
+
+You can find the full TypeScript/JS documentation for this library [here](https://cnutils.turtlecoin.dev).
