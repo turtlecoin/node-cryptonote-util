@@ -1,0 +1,47 @@
+name: CI Build Tests
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  node_build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['10', '11', '12', '13', '14']
+    name: ${{ matrix.os }} - Node ${{ matrix.node }} Test
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+      name: Set up Node
+      with:
+        node-version: ${{ matrix.node }}
+        registry-url: 'https://registry.npmjs.org'
+    - name: Install Windows Node.js Build Tools
+      if: matrix.os == 'windows-latest'
+      run: npm install -g windows-build-tools --vs2015
+    - name: Fetch *nix dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update
+        sudo apt install -y libboost-all-dev
+    - name: Fetch OSX Dependencies
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install --force boost
+    - name: Install Dependencies
+      run: npm install
+    - name: Generate Prebuilds
+      if: matrix.node == '12' && github.event_name == 'release' && matrix.os != 'windows-latest' && github.repository == 'turtlecoin/turtlecoin-crypto'
+      run: |
+        npm install -g prebuild
+        prebuild --all --strip -u ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to NPM
+      if: matrix.node == '12' && matrix.os == 'ubuntu-latest' && github.event_name == 'release' && github.repository == 'turtlecoin/turtlecoin-crypto'
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm publish
