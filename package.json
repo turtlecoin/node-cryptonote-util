@@ -19,7 +19,6 @@
         "test": "node-gyp clean && node-gyp configure && node-gyp build && node test.js"
     },
     "dependencies": {
-        "binding": "^3.0.3",
         "bindings": "^1.5.0",
         "nan": "^2.14.1",
         "safe-buffer": "^5.2.1"
@@ -27,5 +26,6 @@
     "keywords": [
         "cryptonight",
         "cryptonote"
-    ]
+    ],
+    "devDependencies": {}
 }
