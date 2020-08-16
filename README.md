@@ -18,7 +18,7 @@ Supported on the following platforms:
 
 ## Dependencies
 
-* NodeJS (https://nodejs.org/) v6/8/10
+* Node.js LTS (https://nodejs.org/) 10+
 * Boost (http://www.boost.org/)
 
 ## Installation Instructions

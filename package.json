@@ -10,6 +10,10 @@
     "contributors": [
         "Brandon Lehmann <brandonlehmann@gmail.com>"
     ],
+    "engines": {
+        "node": ">=10"
+    },
+    "engineStrict": true,
     "license": "GPL-3.0",
     "repository": {
         "type": "git",
