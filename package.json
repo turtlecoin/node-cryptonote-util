@@ -1,7 +1,8 @@
 {
     "name": "turtlecoin-cryptonote-util",
     "version": "0.0.8",
-    "main": "cryptonote",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "gypfile": true,
     "author": {
         "name": "LucasJones",
@@ -20,8 +21,13 @@
         "url": "https://github.com/turtlecoin/node-cryptonote-util.git"
     },
     "scripts": {
+        "docs": "./node_modules/.bin/typedoc && touch docs/.nojekyll && git restore docs/CNAME",
+        "build-typescript": "./node_modules/.bin/tsc",
         "install": "prebuild-install --download --verbose || node-gyp rebuild",
-        "test": "node-gyp clean && node-gyp configure && node-gyp build && node test.js"
+        "test-node": "./node_modules/.bin/mocha --timeout 60000 --require ts-node/register tests/test.ts",
+        "rebuild-all": "node-gyp clean && node-gyp configure && node-gyp build && npm run build-typescript",
+        "test": "npm run rebuild-all && npm run test-node",
+        "prepublishOnly": "npm run test"
     },
     "dependencies": {
         "bindings": "^1.5.0",
@@ -33,5 +39,12 @@
         "cryptonight",
         "cryptonote"
     ],
-    "devDependencies": {}
+    "devDependencies": {
+        "@types/mocha": "^8.0.2",
+        "@types/node": "^14.0.27",
+        "mocha": "^8.1.1",
+        "ts-node": "^8.10.2",
+        "typedoc": "^0.18.0",
+        "typescript": "^3.9.7"
+    }
 }
